@@ -6,18 +6,67 @@
 <title>Pro X Gaming — Gaming Cafe in Hadapsar, Pune</title>
 <meta name="description" content="Pro X Gaming, Hadapsar Pune — high-end gaming PCs and PS5. Pre-book your slot on WhatsApp. Open 11 AM - 11 PM, every day.">
 
+<script>
+(function () {
+  // Dark is the default on every first visit (prefers-color-scheme is ignored on
+  // purpose). Only an explicit stored choice switches to light. Runs before the
+  // stylesheet paints anything so a returning light-mode visitor never sees a
+  // dark flash first.
+  try {
+    if (localStorage.getItem('px-theme') === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+  } catch (e) {}
+})();
+</script>
+
 <style>
   :root {
     --black: #000000;
     --pink: #E8199B;
     --blue: #2B3FE0;
     --white: #ffffff;
+    --text: #ffffff;
     --gray-text: #b8b8c2;
     --card-bg: #0a0a0d;
     --card-border: #232330;
+    --bar-bg: rgba(0, 0, 0, 0.85);
+    --bar-bg-solid: rgba(0, 0, 0, 0.92);
+  }
+
+  :root[data-theme="light"] {
+    --black: #F5F3F7;
+    --pink: #B4127A;
+    --blue: #1F2FB0;
+    --text: #15121C;
+    --gray-text: #56525f;
+    --card-bg: #ffffff;
+    --card-border: #ddd8e2;
+    --bar-bg: rgba(245, 243, 247, 0.88);
+    --bar-bg-solid: rgba(245, 243, 247, 0.94);
+  }
+
+  /* Theme crossfade — elements below have no other `transition` rule, so a
+     shared declaration is safe. Elements that already transition something
+     else (header, .feature-card, .game-tile, .sticky-cta) get their entries
+     merged directly into their own rule instead, further down. */
+  body, footer, .rates-table, .specs-block, .loyalty-wrap, .insta-wrap,
+  .review-card, .location-info, .map-wrap, .offers-empty, .stamp, .tbd-tag,
+  h1, h2, h3 {
+    transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body, footer, .rates-table, .specs-block, .loyalty-wrap, .insta-wrap,
+    .review-card, .location-info, .map-wrap, .offers-empty, .stamp, .tbd-tag,
+    h1, h2, h3 {
+      transition: none;
+    }
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body { overflow-x: hidden; }
 
   html { scroll-behavior: smooth; }
 
@@ -27,7 +76,7 @@
 
   body {
     background: var(--black);
-    color: var(--white);
+    color: var(--text);
     font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
     line-height: 1.6;
     padding-bottom: 76px; /* room for sticky mobile CTA */
@@ -44,6 +93,12 @@
 
   h1, h2, h3 {
     text-shadow: 0 0 18px rgba(232, 25, 155, 0.35), 0 0 32px rgba(43, 63, 224, 0.2);
+  }
+
+  :root[data-theme="light"] h1,
+  :root[data-theme="light"] h2,
+  :root[data-theme="light"] h3 {
+    text-shadow: none;
   }
 
   .divider {
@@ -156,14 +211,50 @@
     align-items: center;
     justify-content: space-between;
     padding: 14px 24px;
-    background: rgba(0, 0, 0, 0.85);
+    background: var(--bar-bg);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--card-border);
     opacity: 0;
     transform: translateY(-16px) scale(0.96);
     pointer-events: none;
     transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
-                transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+                transform 500ms cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 300ms ease,
+                border-color 300ms ease;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex-shrink: 0;
+  }
+
+  .theme-toggle {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg);
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.05rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: background-color 300ms ease, border-color 300ms ease, transform 150ms ease-out;
+  }
+
+  .theme-toggle:hover {
+    border-color: var(--pink);
+    transform: scale(1.06);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .theme-toggle { transition: none; }
+    .theme-toggle:hover { transform: none; }
   }
 
   header.docked {
@@ -175,18 +266,28 @@
   header .logo-link {
     display: block;
     cursor: pointer;
+    flex-shrink: 0;
   }
 
   header .logo-wrap img {
+    width: auto;
     height: 40px;
+    object-fit: contain;
     display: block;
   }
 
+  header nav {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
   header nav a {
-    color: var(--white);
+    color: var(--text);
     font-size: 0.9rem;
     margin-left: 22px;
     opacity: 0.85;
+    white-space: nowrap;
   }
 
   header nav a:hover { opacity: 1; }
@@ -197,7 +298,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     header {
-      transition: opacity 1ms;
+      transition: none;
       transform: none;
     }
     header.docked { transform: none; }
@@ -212,9 +313,13 @@
 
   .hero-logo-wrap {
     position: relative;
-    width: 60%;
-    max-width: 220px;
+    width: 100%;
+    max-width: 180px;
     margin: 0 auto 28px;
+  }
+
+  @media (max-width: 700px) {
+    .hero-logo-wrap { max-width: 120px; }
   }
 
   .hero-glow-parallax {
@@ -246,9 +351,18 @@
   .hero img.hero-logo {
     position: relative;
     z-index: 1;
-    width: 100%;
+    width: auto;
+    max-width: 100%;
+    height: auto;
+    max-height: 180px;
+    object-fit: contain;
     display: block;
+    margin: 0 auto;
     filter: drop-shadow(0 0 30px rgba(232, 25, 155, 0.3));
+  }
+
+  @media (max-width: 700px) {
+    .hero img.hero-logo { max-height: 120px; }
   }
 
   .hero h1 {
@@ -292,12 +406,13 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: rgba(0,0,0,0.92);
+    background: var(--bar-bg-solid);
     backdrop-filter: blur(6px);
     border-top: 1px solid var(--card-border);
     padding: 12px 16px;
     z-index: 999;
     text-align: center;
+    transition: background-color 300ms ease, border-color 300ms ease;
   }
 
   .sticky-cta .btn-cta {
@@ -309,13 +424,18 @@
     .sticky-cta {
       display: block;
       transform: translateY(100%);
-      transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1);
+      transition: transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
+                  background-color 300ms ease,
+                  border-color 300ms ease;
     }
     .sticky-cta.shown { transform: translateY(0); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sticky-cta { transform: none; transition: none; }
+    .sticky-cta {
+      transform: none;
+      transition: none;
+    }
   }
 
   /* ---------- WHAT WE HAVE ---------- */
@@ -330,10 +450,14 @@
     border: 1px solid var(--card-border);
     border-radius: 14px;
     overflow: hidden;
-    transition: border-color 0.2s ease;
+    transition: border-color 0.2s ease, background-color 300ms ease;
   }
 
   .feature-card:hover { border-color: var(--pink); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .feature-card { transition: none; }
+  }
 
   /* placeholder photo blocks — swap with real photography */
   .placeholder-block {
@@ -451,7 +575,7 @@
 
   .specs-block li:last-child { border-bottom: none; }
 
-  .specs-block li span.label { color: var(--white); font-weight: 600; }
+  .specs-block li span.label { color: var(--text); font-weight: 600; }
 
   /* ---------- GAMES ---------- */
   .games-grid {
@@ -525,7 +649,7 @@
   .stamp.final {
     border: 2px solid var(--pink);
     background: linear-gradient(135deg, rgba(232,25,155,0.2), rgba(43,63,224,0.2));
-    color: var(--white);
+    color: var(--text);
     font-weight: 700;
     animation: stamp-pulse 2.4s ease-in-out infinite;
   }
@@ -673,6 +797,25 @@
     display: block;
   }
 
+  .map-placeholder {
+    height: 100%;
+    min-height: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    padding: 24px;
+    text-align: center;
+    background: var(--card-bg);
+    color: var(--gray-text);
+    font-size: 0.9rem;
+  }
+
+  .map-placeholder-icon {
+    font-size: 2rem;
+  }
+
   /* ---------- FOOTER ---------- */
   footer {
     border-top: 1px solid var(--card-border);
@@ -682,8 +825,11 @@
   }
 
   footer .footer-logo img {
+    width: auto;
     height: 36px;
-    margin-bottom: 18px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 18px;
   }
 
   footer .footer-links {
@@ -712,8 +858,8 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     z-index: -1;
     pointer-events: none;
     display: block;
@@ -731,16 +877,22 @@
 <header id="siteHeader">
   <a class="logo-link" href="#top" id="dockedLogoLink" aria-label="Scroll to top">
     <div class="logo-wrap">
-      <img src="proxgaming_logo.jpg" alt="Pro X Gaming logo">
+      <picture class="theme-logo">
+        <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+        <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo">
+      </picture>
     </div>
   </a>
-  <nav>
-    <a href="#rates">Rates</a>
-    <a href="#games">Games</a>
-    <a href="#loyalty">Loyalty</a>
-    <a href="#reviews">Reviews</a>
-    <a href="#location">Location</a>
-  </nav>
+  <div class="header-right">
+    <nav>
+      <a href="#rates">Rates</a>
+      <a href="#games">Games</a>
+      <a href="#loyalty">Loyalty</a>
+      <a href="#reviews">Reviews</a>
+      <a href="#location">Location</a>
+    </nav>
+    <button type="button" class="theme-toggle" id="themeToggle" aria-label="Switch to light mode">🌙</button>
+  </div>
 </header>
 
 <!-- ============ 1. HERO ============ -->
@@ -749,7 +901,10 @@
     <div class="hero-glow-parallax" aria-hidden="true">
       <div class="hero-glow"></div>
     </div>
-    <img class="hero-logo" src="proxgaming_logo.jpg" alt="Pro X Gaming logo">
+    <picture class="theme-logo">
+      <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+      <img class="hero-logo" data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo" loading="eager">
+    </picture>
   </div>
   <h1>Pro X <span class="gradient-text">Gaming</span></h1>
   <p class="tagline">No stress. Just finesse.</p>
@@ -961,14 +1116,12 @@
         <a href="tel:+918806467979">8806467979</a>
       </p>
     </div>
-    <div class="map-wrap reveal-item" style="--i:1">
-      <iframe
-        src="https://www.google.com/maps?q=Amanora+Plaza+Tower+58+Amanora+Park+Town+Hadapsar+Pune+411028&output=embed"
-        allowfullscreen=""
-        loading="lazy"
-        referrerpolicy="no-referrer-when-downgrade"
-        title="Pro X Gaming location map">
-      </iframe>
+    <div class="map-wrap reveal-item" style="--i:1" id="mapWrap">
+      <div class="map-placeholder" id="mapPlaceholder">
+        <div class="map-placeholder-icon" aria-hidden="true">📍</div>
+        <p>Amanora Plaza, Tower 58, Amanora Park Town, Hadapsar, Pune</p>
+        <button type="button" class="btn-cta small" id="loadMapBtn">View on Google Maps</button>
+      </div>
     </div>
   </div>
 </section>
@@ -976,7 +1129,10 @@
 <!-- ============ 10. FOOTER ============ -->
 <footer>
   <div class="footer-logo">
-    <img src="proxgaming_logo.jpg" alt="Pro X Gaming logo">
+    <picture class="theme-logo">
+      <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+      <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo" loading="lazy">
+    </picture>
   </div>
   <div class="footer-links">
     <a href="tel:+917249406683">Call: 7249406683</a>
@@ -990,6 +1146,70 @@
 <script>
 (function () {
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // Light/dark theme toggle — dark is default, choice persists in localStorage
+  var THEME_KEY = 'px-theme';
+  var root = document.documentElement;
+
+  function currentTheme() {
+    return root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  }
+
+  function applyLogos(theme) {
+    document.querySelectorAll('.theme-logo').forEach(function (pic) {
+      var source = pic.querySelector('source');
+      var img = pic.querySelector('img');
+      if (source) source.srcset = theme === 'light' ? source.dataset.light : source.dataset.dark;
+      if (img) img.src = theme === 'light' ? img.dataset.light : img.dataset.dark;
+    });
+  }
+
+  function updateToggleUI(theme) {
+    var btn = document.getElementById('themeToggle');
+    if (!btn) return;
+    if (theme === 'light') {
+      btn.textContent = '☀️';
+      btn.setAttribute('aria-label', 'Switch to dark mode');
+    } else {
+      btn.textContent = '🌙';
+      btn.setAttribute('aria-label', 'Switch to light mode');
+    }
+  }
+
+  applyLogos(currentTheme());
+  updateToggleUI(currentTheme());
+
+  var themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    themeToggle.addEventListener('click', function () {
+      var next = currentTheme() === 'light' ? 'dark' : 'light';
+      if (next === 'light') {
+        root.setAttribute('data-theme', 'light');
+      } else {
+        root.removeAttribute('data-theme');
+      }
+      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+      applyLogos(next);
+      updateToggleUI(next);
+    });
+  }
+
+  // Google Map: load the iframe only when the visitor taps through, not on page load
+  var loadMapBtn = document.getElementById('loadMapBtn');
+  if (loadMapBtn) {
+    loadMapBtn.addEventListener('click', function () {
+      var mapWrap = document.getElementById('mapWrap');
+      if (!mapWrap) return;
+      var iframe = document.createElement('iframe');
+      iframe.src = 'https://www.google.com/maps?q=Amanora+Plaza+Tower+58+Amanora+Park+Town+Hadapsar+Pune+411028&output=embed';
+      iframe.loading = 'lazy';
+      iframe.referrerPolicy = 'no-referrer-when-downgrade';
+      iframe.title = 'Pro X Gaming location map';
+      iframe.setAttribute('allowfullscreen', '');
+      mapWrap.innerHTML = '';
+      mapWrap.appendChild(iframe);
+    });
+  }
 
   // Scroll-reveal for sections and staggered cards
   var revealEls = document.querySelectorAll('.reveal, .reveal-item');
