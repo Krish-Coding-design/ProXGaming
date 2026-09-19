@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pro X Gaming — Gaming Cafe in Hadapsar, Pune</title>
 <meta name="description" content="Pro X Gaming, Hadapsar Pune — high-end gaming PCs and PS5. Pre-book your slot on WhatsApp. Open 11 AM - 11 PM, every day.">
+<link rel="preload" as="image" href="proxgaming_logo.webp" type="image/webp" fetchpriority="high">
 
 <script>
 (function () {
@@ -127,26 +128,6 @@
     .reveal, .reveal-item {
       opacity: 1;
       transform: none;
-      transition: none;
-    }
-  }
-
-  /* Section headings sweep their gradient in as they reveal */
-  .section-title.reveal {
-    background-size: 200% 100%;
-    background-position: 100% 0;
-    transition: opacity 450ms cubic-bezier(0.16, 1, 0.3, 1),
-                transform 450ms cubic-bezier(0.16, 1, 0.3, 1),
-                background-position 500ms cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .section-title.reveal.in-view {
-    background-position: 0% 0;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .section-title.reveal {
-      background-position: 0% 0;
       transition: none;
     }
   }
@@ -432,10 +413,7 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sticky-cta {
-      transform: none;
-      transition: none;
-    }
+    .sticky-cta { transition: none; }
   }
 
   /* ---------- WHAT WE HAVE ---------- */
@@ -647,20 +625,35 @@
   }
 
   .stamp.final {
+    position: relative;
     border: 2px solid var(--pink);
     background: linear-gradient(135deg, rgba(232,25,155,0.2), rgba(43,63,224,0.2));
     color: var(--text);
     font-weight: 700;
-    animation: stamp-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* Composited "ping" ring — animates only opacity/transform so it runs on
+     the GPU, instead of animating box-shadow (which forces a repaint every
+     frame). */
+  .stamp.final::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 2px solid var(--pink);
+    opacity: 0.6;
+    transform: scale(1);
+    animation: stamp-pulse 2.4s ease-out infinite;
+    pointer-events: none;
   }
 
   @keyframes stamp-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(232, 25, 155, 0.5); }
-    50% { box-shadow: 0 0 14px 5px rgba(232, 25, 155, 0.35); }
+    0% { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.4); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .stamp.final { animation: none; }
+    .stamp.final::after { animation: none; opacity: 0; }
   }
 
   .loyalty-wrap p.detail {
@@ -878,8 +871,8 @@
   <a class="logo-link" href="#top" id="dockedLogoLink" aria-label="Scroll to top">
     <div class="logo-wrap">
       <picture class="theme-logo">
-        <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
-        <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo">
+        <source type="image/webp" srcset="proxgaming_logo.webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+        <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="400" height="400" alt="Pro X Gaming logo">
       </picture>
     </div>
   </a>
@@ -902,8 +895,8 @@
       <div class="hero-glow"></div>
     </div>
     <picture class="theme-logo">
-      <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
-      <img class="hero-logo" data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo" loading="eager">
+      <source type="image/webp" srcset="proxgaming_logo.webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+      <img class="hero-logo" data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="400" height="400" alt="Pro X Gaming logo" loading="eager" fetchpriority="high">
     </picture>
   </div>
   <h1>Pro X <span class="gradient-text">Gaming</span></h1>
@@ -1131,8 +1124,8 @@
 <footer>
   <div class="footer-logo">
     <picture class="theme-logo">
-      <source type="image/webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
-      <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="1080" height="1080" alt="Pro X Gaming logo" loading="lazy">
+      <source type="image/webp" srcset="proxgaming_logo.webp" data-dark="proxgaming_logo.webp" data-light="proxgaming_logo_nobg.webp">
+      <img data-dark="proxgaming_logo.jpg" data-light="proxgaming_logo_nobg.png" src="proxgaming_logo.jpg" width="400" height="400" alt="Pro X Gaming logo" loading="lazy">
     </picture>
   </div>
   <div class="footer-links">
@@ -1148,7 +1141,19 @@
 (function () {
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // Light/dark theme toggle — dark is default, choice persists in localStorage
+  // Splits non-critical setup into its own task instead of running everything
+  // back-to-back in one long block, so each piece can yield to the main thread.
+  function defer(fn) {
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(fn, { timeout: 1500 });
+    } else {
+      setTimeout(fn, 0);
+    }
+  }
+
+  // Light/dark theme toggle — dark is default, choice persists in localStorage.
+  // Runs immediately (not deferred): it's cheap (a handful of elements) and
+  // must reflect the correct theme/logo/icon without any visible flash.
   var THEME_KEY = 'px-theme';
   var root = document.documentElement;
 
@@ -1177,6 +1182,8 @@
     }
   }
 
+  // The raw HTML already matches the dark default, so this only does real
+  // work (and only touches the network) for a returning light-mode visitor.
   applyLogos(currentTheme());
   updateToggleUI(currentTheme());
 
@@ -1195,9 +1202,13 @@
     });
   }
 
+  // Everything below is non-critical to first paint — deferred so it runs as
+  // its own (small) task rather than adding to one long initial task.
+
   // Google Map: load the iframe only when the visitor taps through, not on page load
-  var loadMapBtn = document.getElementById('loadMapBtn');
-  if (loadMapBtn) {
+  defer(function () {
+    var loadMapBtn = document.getElementById('loadMapBtn');
+    if (!loadMapBtn) return;
     loadMapBtn.addEventListener('click', function () {
       var mapWrap = document.getElementById('mapWrap');
       if (!mapWrap) return;
@@ -1210,13 +1221,15 @@
       mapWrap.innerHTML = '';
       mapWrap.appendChild(iframe);
     });
-  }
+  });
 
   // Scroll-reveal for sections and staggered cards
-  var revealEls = document.querySelectorAll('.reveal, .reveal-item');
-  if (reduceMotion || !('IntersectionObserver' in window)) {
-    revealEls.forEach(function (el) { el.classList.add('in-view'); });
-  } else {
+  defer(function () {
+    var revealEls = document.querySelectorAll('.reveal, .reveal-item');
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      revealEls.forEach(function (el) { el.classList.add('in-view'); });
+      return;
+    }
     var revealObserver = new IntersectionObserver(function (entries, obs) {
       entries.forEach(function (entry) {
         if (entry.isIntersecting) {
@@ -1226,25 +1239,12 @@
       });
     }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
     revealEls.forEach(function (el) { revealObserver.observe(el); });
-  }
-
-  // Sticky mobile CTA: slide up into place shortly after load instead of popping in
-  var stickyCta = document.querySelector('.sticky-cta');
-  if (stickyCta) {
-    if (reduceMotion) {
-      stickyCta.classList.add('shown');
-    } else {
-      requestAnimationFrame(function () {
-        requestAnimationFrame(function () {
-          stickyCta.classList.add('shown');
-        });
-      });
-    }
-  }
+  });
 
   // Parallax drift on the hero glow — cheap, rAF-throttled, skipped under reduced motion
-  var heroGlow = document.querySelector('.hero-glow-parallax');
-  if (heroGlow && !reduceMotion) {
+  defer(function () {
+    var heroGlow = document.querySelector('.hero-glow-parallax');
+    if (!heroGlow || reduceMotion) return;
     var parallaxTicking = false;
     var updateParallax = function () {
       var offset = Math.min(window.scrollY * 0.15, 60);
@@ -1258,101 +1258,129 @@
       }
     }, { passive: true });
     updateParallax();
-  }
+  });
 
-  // Docked header: appears once the hero scrolls out of view, hides again over the hero
-  var header = document.getElementById('siteHeader');
-  var hero = document.querySelector('.hero');
-  if (header && hero && 'IntersectionObserver' in window) {
-    var headerObserver = new IntersectionObserver(function (entries) {
+  // Docked header + sticky mobile CTA both key off the same signal: whether
+  // the hero is still in view. Neither should show until the visitor has
+  // actually scrolled past the hero (the sticky CTA used to appear on a
+  // post-load timer regardless of scroll position, showing alongside the
+  // hero's own CTA at the same time on mobile — fixed by tying it to this
+  // observer instead).
+  defer(function () {
+    var header = document.getElementById('siteHeader');
+    var stickyCta = document.querySelector('.sticky-cta');
+    var hero = document.querySelector('.hero');
+    if (!hero) return;
+
+    if (!('IntersectionObserver' in window)) {
+      if (header) header.classList.add('docked');
+      if (stickyCta) stickyCta.classList.add('shown');
+      return;
+    }
+
+    var heroObserver = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        header.classList.toggle('docked', !entry.isIntersecting);
+        var pastHero = !entry.isIntersecting;
+        if (header) header.classList.toggle('docked', pastHero);
+        if (stickyCta) stickyCta.classList.toggle('shown', pastHero);
       });
     }, { threshold: 0 });
-    headerObserver.observe(hero);
+    heroObserver.observe(hero);
+  });
+
+  // Drifting particle background — only starts once the page has actually
+  // loaded (never competes with initial render), dim pink/blue dots, capped
+  // fps, fewer of them on mobile, paused when the tab isn't visible.
+  function startParticles() {
+    if (reduceMotion) return;
+    var canvas = document.getElementById('particleCanvas');
+    if (!canvas || !canvas.getContext) return;
+    var ctx = canvas.getContext('2d');
+    var particles = [];
+    var width = 0, height = 0;
+
+    function particleCount() {
+      return window.innerWidth < 768 ? 16 : 40;
+    }
+
+    function resizeCanvas() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+
+    function makeParticle() {
+      var pink = Math.random() < 0.5;
+      return {
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: 1 + Math.random() * 1.6,
+        speed: 6 + Math.random() * 12,
+        drift: (Math.random() - 0.5) * 4,
+        alpha: 0.1 + Math.random() * 0.18,
+        color: pink ? '232,25,155' : '43,63,224'
+      };
+    }
+
+    function seedParticles() {
+      var count = particleCount();
+      particles = [];
+      for (var i = 0; i < count; i++) particles.push(makeParticle());
+    }
+
+    resizeCanvas();
+    seedParticles();
+
+    var running = !document.hidden;
+    var lastFrame = 0;
+    var frameInterval = 1000 / 24;
+
+    function tick(ts) {
+      requestAnimationFrame(tick);
+      if (!running) return;
+      if (ts - lastFrame < frameInterval) return;
+      var dt = lastFrame ? (ts - lastFrame) / 1000 : 0;
+      lastFrame = ts;
+
+      ctx.clearRect(0, 0, width, height);
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.y -= p.speed * dt;
+        p.x += p.drift * dt;
+        if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
+        if (p.x < -10) p.x = width + 10;
+        if (p.x > width + 10) p.x = -10;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(' + p.color + ',' + p.alpha + ')';
+        ctx.fill();
+      }
+    }
+    requestAnimationFrame(tick);
+
+    document.addEventListener('visibilitychange', function () {
+      running = !document.hidden;
+      if (running) lastFrame = 0;
+    });
+
+    var resizeTimer;
+    window.addEventListener('resize', function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        resizeCanvas();
+        seedParticles();
+      }, 200);
+    }, { passive: true });
   }
 
-  // Drifting particle background — dim pink/blue dots, capped fps, paused when hidden
   if (!reduceMotion) {
-    var canvas = document.getElementById('particleCanvas');
-    if (canvas && canvas.getContext) {
-      var ctx = canvas.getContext('2d');
-      var particles = [];
-      var width = 0, height = 0;
-
-      function particleCount() {
-        return window.innerWidth < 768 ? 18 : 40;
-      }
-
-      function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-      }
-
-      function makeParticle() {
-        var pink = Math.random() < 0.5;
-        return {
-          x: Math.random() * width,
-          y: Math.random() * height,
-          r: 1 + Math.random() * 1.6,
-          speed: 6 + Math.random() * 12,
-          drift: (Math.random() - 0.5) * 4,
-          alpha: 0.1 + Math.random() * 0.18,
-          color: pink ? '232,25,155' : '43,63,224'
-        };
-      }
-
-      function seedParticles() {
-        var count = particleCount();
-        particles = [];
-        for (var i = 0; i < count; i++) particles.push(makeParticle());
-      }
-
-      resizeCanvas();
-      seedParticles();
-
-      var running = !document.hidden;
-      var lastFrame = 0;
-      var frameInterval = 1000 / 30;
-
-      function tick(ts) {
-        requestAnimationFrame(tick);
-        if (!running) return;
-        if (ts - lastFrame < frameInterval) return;
-        var dt = lastFrame ? (ts - lastFrame) / 1000 : 0;
-        lastFrame = ts;
-
-        ctx.clearRect(0, 0, width, height);
-        for (var i = 0; i < particles.length; i++) {
-          var p = particles[i];
-          p.y -= p.speed * dt;
-          p.x += p.drift * dt;
-          if (p.y < -10) { p.y = height + 10; p.x = Math.random() * width; }
-          if (p.x < -10) p.x = width + 10;
-          if (p.x > width + 10) p.x = -10;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-          ctx.fillStyle = 'rgba(' + p.color + ',' + p.alpha + ')';
-          ctx.fill();
-        }
-      }
-      requestAnimationFrame(tick);
-
-      document.addEventListener('visibilitychange', function () {
-        running = !document.hidden;
-        if (running) lastFrame = 0;
+    if (document.readyState === 'complete') {
+      defer(startParticles);
+    } else {
+      window.addEventListener('load', function () {
+        defer(startParticles);
       });
-
-      var resizeTimer;
-      window.addEventListener('resize', function () {
-        clearTimeout(resizeTimer);
-        resizeTimer = setTimeout(function () {
-          resizeCanvas();
-          seedParticles();
-        }, 200);
-      }, { passive: true });
     }
   }
 })();
