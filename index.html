@@ -806,12 +806,6 @@
     padding: 22px;
   }
 
-  .review-card .stars {
-    color: #ffcc33;
-    margin-bottom: 10px;
-    font-size: 0.95rem;
-  }
-
   .review-card p {
     color: var(--gray-text);
     font-size: 0.92rem;
@@ -820,16 +814,28 @@
 
   .reviews-summary {
     text-align: center;
+    margin-bottom: 22px;
   }
 
   .reviews-summary .big-rating {
     font-size: 2.2rem;
     font-weight: 800;
+    line-height: 1.2;
   }
 
-  .reviews-summary a {
-    display: inline-block;
-    margin-top: 10px;
+  .reviews-summary .reviews-line {
+    color: var(--gray-text);
+    font-size: 0.95rem;
+  }
+
+  .reviews-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .reviews-actions .reviews-link {
     font-size: 0.9rem;
     color: var(--pink);
     text-decoration: underline;
@@ -1212,24 +1218,26 @@
     <figcaption>Notes from our customers, on the wall at the cafe.</figcaption>
   </figure>
   <div>
+  <!-- Only the overall Google rating is shown; individual review ratings
+       aren't displayed because they can't be verified from here. -->
+  <div class="reviews-summary reveal">
+    <div class="big-rating gradient-text">4.8 ★</div>
+    <p class="reviews-line">Rated 4.8 out of 5 by 70+ gamers on Google.</p>
+  </div>
   <div class="reviews-grid">
     <div class="review-card reveal-item" style="--i:0">
-      <div class="stars">★★★★★</div>
       <p>"Smooth performance, low lag, and super easy to use. The people here are very humble and show respect to each and every customer."</p>
     </div>
     <div class="review-card reveal-item" style="--i:1">
-      <div class="stars">★★★★★</div>
       <p>"Top-notch setup with powerful PCs, comfortable seating, and a great gaming atmosphere. The staff were extremely cooperative and friendly."</p>
     </div>
     <div class="review-card reveal-item" style="--i:2">
-      <div class="stars">★★★★★</div>
       <p>"Powerful gaming setups, super comfortable chairs, and an environment perfectly designed for long sessions. PC gaming, racing, or console — they've got everything."</p>
     </div>
   </div>
-  <div class="reviews-summary reveal">
-    <div class="big-rating gradient-text">4.8 ★</div>
-    <div>71+ Google reviews</div>
-    <a href="https://www.google.com/search?q=Pro+X+Gaming+Amanora+Park+Town+Hadapsar+Pune" target="_blank" rel="noopener">See all reviews on Google →</a>
+  <div class="reviews-actions reveal">
+    <a class="btn-cta" href="https://search.google.com/local/writereview?placeid=ChIJiduLQwDDwjsRXwm9s2P3w9A" target="_blank" rel="noopener">LEAVE A REVIEW</a>
+    <a class="reviews-link" href="https://www.google.com/maps/place/?q=place_id:ChIJiduLQwDDwjsRXwm9s2P3w9A" target="_blank" rel="noopener">See all reviews on Google →</a>
   </div>
   </div>
   </div>
