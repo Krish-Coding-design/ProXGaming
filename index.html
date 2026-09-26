@@ -6,6 +6,7 @@
 <title>Pro X Gaming — Gaming Cafe in Hadapsar, Pune</title>
 <meta name="description" content="Pro X Gaming, Hadapsar Pune — high-end gaming PCs and PS5. Pre-book your slot on WhatsApp. Open 11 AM - 11 PM, every day.">
 <link rel="preload" as="image" href="proxgaming_logo.webp" type="image/webp" fetchpriority="high">
+<link rel="preload" as="image" type="image/webp" imagesrcset="Images/counter-wide-sm.webp 800w, Images/counter-wide.webp 1600w" imagesizes="100vw">
 
 <script>
 (function () {
@@ -33,6 +34,14 @@
     --card-border: #232330;
     --bar-bg: rgba(0, 0, 0, 0.85);
     --bar-bg-solid: rgba(0, 0, 0, 0.92);
+    /* Cafe photos are dark and heavily pink/purple — a touch more contrast and
+       a little less saturation pulls them toward the site palette while
+       keeping the neon. */
+    --photo-filter: contrast(1.08) saturate(0.85);
+    /* Radial layer dims the photo directly behind the heading/tagline (the
+       photo's own neon "PRO X GAMING" sign otherwise ghosts behind the h1). */
+    --hero-overlay: radial-gradient(ellipse 55% 50% at 50% 55%, rgba(0, 0, 0, 0.55), transparent 80%),
+                    linear-gradient(180deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.62) 45%, rgba(0, 0, 0, 0.94) 100%);
   }
 
   :root[data-theme="light"] {
@@ -45,6 +54,9 @@
     --card-border: #ddd8e2;
     --bar-bg: rgba(245, 243, 247, 0.88);
     --bar-bg-solid: rgba(245, 243, 247, 0.94);
+    /* Light theme text is dark, so the hero photo gets a light wash instead */
+    --hero-overlay: radial-gradient(ellipse 55% 50% at 50% 55%, rgba(245, 243, 247, 0.55), transparent 80%),
+                    linear-gradient(180deg, rgba(245, 243, 247, 0.80) 0%, rgba(245, 243, 247, 0.70) 45%, rgba(245, 243, 247, 0.96) 100%);
   }
 
   /* Theme crossfade — elements below have no other `transition` rule, so a
@@ -286,6 +298,46 @@
   }
 
   /* ---------- HERO ---------- */
+  /* Full-bleed wrapper so the photo spans the viewport while the hero content
+     keeps its own max-width. */
+  .hero-wrap {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .hero-bg img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 75%;
+    filter: var(--photo-filter);
+    z-index: -2;
+  }
+
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: var(--hero-overlay);
+    z-index: -1;
+  }
+
+  /* On phones the photo is scaled to the hero's height, so repositioning
+     can't move the neon sign out from behind the heading — darken the
+     centre harder instead. */
+  @media (max-width: 700px) {
+    :root {
+      --hero-overlay: radial-gradient(ellipse 80% 45% at 50% 45%, rgba(0, 0, 0, 0.8), transparent 85%),
+                      linear-gradient(180deg, rgba(0, 0, 0, 0.74) 0%, rgba(0, 0, 0, 0.62) 45%, rgba(0, 0, 0, 0.94) 100%);
+    }
+    :root[data-theme="light"] {
+      --hero-overlay: radial-gradient(ellipse 80% 45% at 50% 45%, rgba(245, 243, 247, 0.8), transparent 85%),
+                      linear-gradient(180deg, rgba(245, 243, 247, 0.80) 0%, rgba(245, 243, 247, 0.70) 45%, rgba(245, 243, 247, 0.96) 100%);
+    }
+  }
+
   .hero {
     text-align: center;
     padding: 40px 20px 70px;
@@ -437,22 +489,65 @@
     .feature-card { transition: none; }
   }
 
-  /* placeholder photo blocks — swap with real photography */
-  .placeholder-block {
-    height: 160px;
+  .feature-photo {
+    display: block;
     width: 100%;
+    height: 200px;
+    object-fit: cover;
+    filter: var(--photo-filter);
   }
 
-  .placeholder-block.pcs {
-    background: linear-gradient(135deg, var(--pink), var(--blue));
+  /* placeholder photo block — no PS5 photo yet */
+  .placeholder-block {
+    height: 200px;
+    width: 100%;
   }
 
   .placeholder-block.ps5 {
     background: linear-gradient(135deg, var(--blue), #6a1fb0);
   }
 
-  .placeholder-block.seating {
-    background: linear-gradient(135deg, #1a1a2e, var(--pink));
+  /* ---------- PHOTO + CONTENT SPLIT (Games, Reviews) ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 28px;
+    align-items: center;
+  }
+
+  .split-photo {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--card-border);
+  }
+
+  .split-photo img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    filter: var(--photo-filter);
+  }
+
+  .split-photo figcaption,
+  .location-photo figcaption {
+    font-size: 0.8rem;
+    color: var(--gray-text);
+    padding: 8px 12px;
+    background: var(--card-bg);
+  }
+
+  .split .games-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 800px) {
+    .split { grid-template-columns: 1fr; }
+    .split-photo img {
+      aspect-ratio: 4 / 3;
+      max-height: 340px;
+    }
   }
 
   .feature-card .feature-body {
@@ -757,6 +852,21 @@
     border: 1px solid var(--card-border);
     border-radius: 14px;
     padding: 26px;
+    overflow: hidden;
+  }
+
+  /* Photo sits flush with the card's top edge, cancelling its padding */
+  .location-photo {
+    margin: -26px -26px 22px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .location-photo img {
+    display: block;
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    filter: var(--photo-filter);
   }
 
   .location-info h3 {
@@ -885,6 +995,11 @@
 </header>
 
 <!-- ============ 1. HERO ============ -->
+<div class="hero-wrap">
+<div class="hero-bg" aria-hidden="true">
+  <img src="Images/counter-wide.webp" srcset="Images/counter-wide-sm.webp 800w, Images/counter-wide.webp 1600w" sizes="100vw" width="1600" height="1200" alt="" decoding="async" fetchpriority="high">
+</div>
+<div class="hero-overlay" aria-hidden="true"></div>
 <section class="hero" id="top">
   <div class="hero-logo-wrap">
     <div class="hero-glow-parallax" aria-hidden="true">
@@ -902,6 +1017,7 @@
   <p class="how-to-book">Tap the button to message us on WhatsApp with your preferred date, time and device (PC or PS5) — we'll confirm your slot.</p>
   <div class="rating-badge"><span class="stars">★★★★★</span> 4.8 on Google · 71+ reviews</div>
 </section>
+</div>
 
 <hr class="divider">
 
@@ -916,8 +1032,7 @@
   <p class="section-sub">Built for long, serious gaming sessions.</p>
   <div class="feature-grid">
     <div class="feature-card reveal-item" style="--i:0">
-      <!-- PLACEHOLDER: photo of gaming PC setup goes here -->
-      <div class="placeholder-block pcs"></div>
+      <img class="feature-photo" src="Images/pc-room.webp" width="800" height="600" alt="Row of gaming PCs with RGB-lit cases, customers playing" loading="lazy" decoding="async">
       <div class="feature-body">
         <h3>High-End Gaming PCs</h3>
         <p>Top-tier rigs built to run the latest titles smoothly at high settings.</p>
@@ -932,8 +1047,7 @@
       </div>
     </div>
     <div class="feature-card reveal-item" style="--i:2">
-      <!-- PLACEHOLDER: photo of cafe seating / lounge area goes here -->
-      <div class="placeholder-block seating"></div>
+      <img class="feature-photo" src="Images/pc-setup.webp" width="800" height="600" alt="Gaming chairs at a PC setup with an RGB rig" loading="lazy" decoding="async">
       <div class="feature-body">
         <h3>Comfortable Seating</h3>
         <p>Gaming chairs and a setup made for long sessions without the fatigue.</p>
@@ -1026,11 +1140,16 @@
 <section id="games">
   <h2 class="section-title gradient-text reveal">Games</h2>
   <p class="section-sub">A growing library across PC and PS5.</p>
-  <div class="games-grid">
-    <div class="game-tile reveal-item" style="--i:0">Red Dead Redemption 2</div>
-    <div class="game-tile reveal-item" style="--i:1">EA FC 25</div>
-    <div class="game-tile reveal-item" style="--i:2">God of War</div>
-    <div class="game-tile more reveal-item" style="--i:3">+ more titles<br>ask us in-store</div>
+  <div class="split">
+    <figure class="split-photo reveal">
+      <img src="Images/games-door.webp" width="600" height="800" alt="Door covered in game posters including Mortal Kombat, Call of Duty and EA FC 25" loading="lazy" decoding="async">
+    </figure>
+    <div class="games-grid">
+      <div class="game-tile reveal-item" style="--i:0">Red Dead Redemption 2</div>
+      <div class="game-tile reveal-item" style="--i:1">EA FC 25</div>
+      <div class="game-tile reveal-item" style="--i:2">God of War</div>
+      <div class="game-tile more reveal-item" style="--i:3">+ more titles<br>ask us in-store</div>
+    </div>
   </div>
 </section>
 
@@ -1087,6 +1206,12 @@
 <!-- ============ 8. REVIEWS ============ -->
 <section id="reviews">
   <h2 class="section-title gradient-text reveal">Reviews</h2>
+  <div class="split">
+  <figure class="split-photo reveal">
+    <img src="Images/reviews-wall.webp" width="600" height="800" alt="Cafe wall with a gaming poster and sticky notes left by customers" loading="lazy" decoding="async">
+    <figcaption>Notes from our customers, on the wall at the cafe.</figcaption>
+  </figure>
+  <div>
   <div class="reviews-grid">
     <div class="review-card reveal-item" style="--i:0">
       <div class="stars">★★★★★</div>
@@ -1106,6 +1231,8 @@
     <div>71+ Google reviews</div>
     <a href="https://www.google.com/search?q=Pro+X+Gaming+Amanora+Park+Town+Hadapsar+Pune" target="_blank" rel="noopener">See all reviews on Google →</a>
   </div>
+  </div>
+  </div>
 </section>
 
 <hr class="divider">
@@ -1115,6 +1242,10 @@
   <h2 class="section-title gradient-text reveal">Location</h2>
   <div class="location-grid">
     <div class="location-info reveal-item" style="--i:0">
+      <figure class="location-photo">
+        <img src="Images/counter.webp" width="800" height="600" alt="Pro X Gaming front counter under the pink neon logo sign" loading="lazy" decoding="async">
+        <figcaption>Look for the neon sign at the counter.</figcaption>
+      </figure>
       <h3>Address</h3>
       <p>Amanora Plaza, Tower 58, Shop No. 19,<br>Amanora Park Town, Hadapsar,<br>Pune 411028</p>
       <h3>Hours</h3>
