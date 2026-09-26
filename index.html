@@ -51,15 +51,15 @@
      shared declaration is safe. Elements that already transition something
      else (header, .feature-card, .game-tile, .sticky-cta) get their entries
      merged directly into their own rule instead, further down. */
-  body, footer, .rates-table, .specs-block, .loyalty-wrap, .insta-wrap,
-  .review-card, .location-info, .map-wrap, .offers-empty, .stamp, .tbd-tag,
+  body, footer, .rates-table, .loyalty-wrap, .insta-wrap,
+  .review-card, .location-info, .map-wrap, .offers-empty, .stamp,
   h1, h2, h3 {
     transition: background-color 300ms ease, color 300ms ease, border-color 300ms ease;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    body, footer, .rates-table, .specs-block, .loyalty-wrap, .insta-wrap,
-    .review-card, .location-info, .map-wrap, .offers-empty, .stamp, .tbd-tag,
+    body, footer, .rates-table, .loyalty-wrap, .insta-wrap,
+    .review-card, .location-info, .map-wrap, .offers-empty, .stamp,
     h1, h2, h3 {
       transition: none;
     }
@@ -470,12 +470,39 @@
   }
 
   /* ---------- RATES TABLE ---------- */
+  .rates-group {
+    margin-bottom: 36px;
+  }
+
+  .rates-group h3 {
+    font-size: 1.2rem;
+    margin-bottom: 4px;
+  }
+
+  .rates-group .rates-note {
+    color: var(--gray-text);
+    font-size: 0.88rem;
+    margin-bottom: 14px;
+  }
+
+  /* Tables scroll sideways inside this wrapper on narrow screens instead of
+     squashing columns or pushing the page wider than the viewport. */
+  .rates-scroll {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 14px;
+  }
+
+  .rates-scroll:focus-visible {
+    outline: 2px solid var(--pink);
+    outline-offset: 2px;
+  }
+
   .rates-table {
     width: 100%;
     border-collapse: collapse;
     border-radius: 14px;
     overflow: hidden;
-    margin-bottom: 30px;
     border: 2px solid transparent;
     background-image: linear-gradient(var(--card-bg), var(--card-bg)),
                        linear-gradient(135deg, var(--pink), var(--blue));
@@ -487,6 +514,13 @@
     padding: 16px 18px;
     text-align: left;
     border-bottom: 1px solid var(--card-border);
+    white-space: nowrap;
+  }
+
+  .rates-table td.price { font-weight: 600; }
+
+  @media (max-width: 700px) {
+    .rates-table th, .rates-table td { padding: 12px 14px; }
   }
 
   .rates-table tbody tr {
@@ -512,48 +546,10 @@
 
   .rates-table tr:last-child td { border-bottom: none; }
 
-  .tbd-tag {
-    display: inline-block;
-    font-size: 0.7rem;
-    font-weight: 700;
-    color: #000;
-    background: #ffcc33;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-left: 8px;
-    letter-spacing: 0.03em;
-  }
-
   .rates-cta {
     text-align: center;
     margin-top: 10px;
   }
-
-  /* ---------- SPECS ---------- */
-  .specs-block {
-    background: var(--card-bg);
-    border: 1px dashed var(--card-border);
-    border-radius: 14px;
-    padding: 30px;
-  }
-
-  .specs-block ul {
-    list-style: none;
-    margin-top: 14px;
-  }
-
-  .specs-block li {
-    padding: 8px 0;
-    border-bottom: 1px solid var(--card-border);
-    color: var(--gray-text);
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.95rem;
-  }
-
-  .specs-block li:last-child { border-bottom: none; }
-
-  .specs-block li span.label { color: var(--text); font-weight: 600; }
 
   /* ---------- GAMES ---------- */
   .games-grid {
@@ -951,57 +947,76 @@
 <!-- ============ 3. RATES ============ -->
 <section id="rates">
   <h2 class="section-title gradient-text reveal">Rates</h2>
-  <p class="section-sub">Placeholder pricing — final rates to be confirmed by the owner.</p>
-  <table class="rates-table reveal">
-    <thead>
-      <tr>
-        <th>Station</th>
-        <th>Duration</th>
-        <th>Price</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Gaming PC</td>
-        <td>1 hour</td>
-        <td>₹ TBD <span class="tbd-tag">TBD</span></td>
-      </tr>
-      <tr>
-        <td>Gaming PC</td>
-        <td>3 hours</td>
-        <td>₹ TBD <span class="tbd-tag">TBD</span></td>
-      </tr>
-      <tr>
-        <td>PS5</td>
-        <td>1 hour</td>
-        <td>₹ TBD <span class="tbd-tag">TBD</span></td>
-      </tr>
-      <tr>
-        <td>PS5</td>
-        <td>3 hours</td>
-        <td>₹ TBD <span class="tbd-tag">TBD</span></td>
-      </tr>
-    </tbody>
-  </table>
+  <p class="section-sub">Pay per session. Longer sessions work out cheaper per hour.</p>
+
+  <div class="rates-group reveal">
+    <h3>PlayStation 5</h3>
+    <p class="rates-note">Price per session, by number of players.</p>
+    <div class="rates-scroll" tabindex="0" role="region" aria-label="PlayStation 5 rates">
+      <table class="rates-table">
+        <thead>
+          <tr>
+            <th>Players</th>
+            <th>1 Hour</th>
+            <th>2 Hours</th>
+            <th>3 Hours</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 Player</td><td class="price">₹150</td><td class="price">₹280</td><td class="price">₹400</td></tr>
+          <tr><td>2 Players</td><td class="price">₹250</td><td class="price">₹460</td><td class="price">₹660</td></tr>
+          <tr><td>3 Players</td><td class="price">₹330</td><td class="price">₹600</td><td class="price">₹850</td></tr>
+          <tr><td>4 Players</td><td class="price">₹400</td><td class="price">₹750</td><td class="price">₹1000</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rates-group reveal">
+    <h3>PS5 Extension</h3>
+    <p class="rates-note">Add 30 minutes to a PS5 session.</p>
+    <div class="rates-scroll" tabindex="0" role="region" aria-label="PS5 extension rates">
+      <table class="rates-table">
+        <thead>
+          <tr>
+            <th>Players</th>
+            <th>30 Minutes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>1 Player</td><td class="price">₹80</td></tr>
+          <tr><td>2 Players</td><td class="price">₹130</td></tr>
+          <tr><td>3 Players</td><td class="price">₹170</td></tr>
+          <tr><td>4 Players</td><td class="price">₹210</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="rates-group reveal">
+    <h3>PC Gaming</h3>
+    <p class="rates-note">Price per PC.</p>
+    <div class="rates-scroll" tabindex="0" role="region" aria-label="PC gaming rates">
+      <table class="rates-table">
+        <thead>
+          <tr>
+            <th>Duration</th>
+            <th>Price</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>60 Minutes</td><td class="price">₹100</td></tr>
+          <tr><td>2 Hours</td><td class="price">₹180</td></tr>
+          <tr><td>3 Hours</td><td class="price">₹250</td></tr>
+          <tr><td>5 Hours</td><td class="price">₹400</td></tr>
+          <tr><td>30 Min Extension</td><td class="price">₹60</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <div class="rates-cta">
     <a class="btn-cta" href="https://wa.me/917249406683?text=Hi%2C%20I%20want%20to%20book%20a%20slot%20at%20Pro%20X%20Gaming" target="_blank" rel="noopener">PRE-BOOK YOUR SLOT</a>
-  </div>
-</section>
-
-<hr class="divider">
-
-<!-- ============ 4. PC SPECS ============ -->
-<section id="specs">
-  <h2 class="section-title gradient-text reveal">PC Specs</h2>
-  <p class="section-sub">Placeholder specs — to be updated with exact hardware.</p>
-  <div class="specs-block reveal">
-    <ul>
-      <li><span class="label">CPU</span> <span>TBD</span></li>
-      <li><span class="label">GPU</span> <span>TBD</span></li>
-      <li><span class="label">RAM</span> <span>TBD</span></li>
-      <li><span class="label">Monitor / Refresh Rate</span> <span>TBD</span></li>
-      <li><span class="label">Peripherals</span> <span>TBD</span></li>
-    </ul>
   </div>
 </section>
 
@@ -1107,7 +1122,8 @@
       <h3>Contact</h3>
       <p>
         <a href="tel:+917249406683">7249406683</a><br>
-        <a href="tel:+918806467979">8806467979</a>
+        <a href="tel:+918806467979">8806467979</a><br>
+        <a href="tel:+918087795181">8087795181</a>
       </p>
     </div>
     <div class="map-wrap reveal-item" style="--i:1" id="mapWrap">
@@ -1131,6 +1147,7 @@
   <div class="footer-links">
     <a href="tel:+917249406683">Call: 7249406683</a>
     <a href="tel:+918806467979">Call: 8806467979</a>
+    <a href="tel:+918087795181">Call: 8087795181</a>
     <a href="https://wa.me/917249406683?text=Hi%2C%20I%20want%20to%20book%20a%20slot%20at%20Pro%20X%20Gaming" target="_blank" rel="noopener">WhatsApp</a>
     <a href="https://instagram.com/pro.x.gaming_official" target="_blank" rel="noopener">Instagram @pro.x.gaming_official</a>
   </div>
